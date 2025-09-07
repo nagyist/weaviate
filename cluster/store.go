@@ -538,6 +538,14 @@ func (st *Store) Close(ctx context.Context) error {
 		st.log.WithError(err).Warn("close raft-net")
 	}
 
+	if err := st.cfg.NodeSelector.Leave(); err != nil {
+		st.log.WithError(err).Error("leave node from cluster")
+	}
+
+	if err := st.cfg.NodeSelector.Shutdown(); err != nil {
+		st.log.WithError(err).Error("shutdown node from cluster")
+	}
+
 	st.log.Info("closing log store ...")
 	if err := st.logStore.Close(); err != nil {
 		return fmt.Errorf("close log store: %w", err)
